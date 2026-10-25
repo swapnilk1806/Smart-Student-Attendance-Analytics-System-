@@ -1,0 +1,38 @@
+
+    <div class="stats-grid">
+      <div class="stat"><div class="icon i1"><i class="fa-solid fa-users"></i></div>
+        <div><div class="value">{{ total_students }}</div><div class="label">Total Students</div></div></div>
+      <div class="stat"><div class="icon i2"><i class="fa-solid fa-building-columns"></i></div>
+        <div><div class="value">{{ total_departments }}</div><div class="label">Departments</div></div></div>
+      <div class="stat"><div class="icon i3"><i class="fa-solid fa-clipboard-list"></i></div>
+        <div><div class="value">{{ total_records }}</div><div class="label">Attendance Records</div></div></div>
+      <div class="stat"><div class="icon i4"><i class="fa-solid fa-user-check"></i></div>
+        <div><div class="value">{{ today_present }}</div><div class="label">Present Today</div></div></div>
+      <div class="stat"><div class="icon i5"><i class="fa-solid fa-user-xmark"></i></div>
+        <div><div class="value">{{ today_absent }}</div><div class="label">Absent Today</div></div></div>
+      <div class="stat"><div class="icon i6"><i class="fa-solid fa-percent"></i></div>
+        <div><div class="value">{{ overall_pct }}%</div><div class="label">Overall Attendance</div></div></div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="card"><h3>Present / Late / Absent (All Records)</h3>
+        <div class="chart-box"><canvas id="chartDoughnut"></canvas></div></div>
+      <div class="card"><h3>Monthly Attendance Trend (%)</h3>
+        <div class="chart-box"><canvas id="chartMonthly"></canvas></div></div>
+      <div class="card"><h3>Weekly Attendance Statistics</h3>
+        <div class="chart-box"><canvas id="chartWeekly"></canvas></div></div>
+      <div class="card"><h3>Department-wise Student Distribution</h3>
+        <div class="chart-box"><canvas id="chartDept"></canvas></div></div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h3>How attendance is calculated</h3>
+      <p class="muted">
+        Attendance % = (Present credits + Late credits × {{ late_credit }})
+        ÷ Total recorded sessions × 100.<br>
+        Present = 1.0 credit · Late = {{ late_credit }} credit (configurable in Settings) ·
+        Absent = 0 credits. Days with <strong>no recorded attendance</strong> are excluded
+        from the denominator.
+      </p>
+    </div>
+    

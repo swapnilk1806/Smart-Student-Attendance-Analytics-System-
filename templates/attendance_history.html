@@ -1,0 +1,49 @@
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3 style="margin-bottom:3px">{{ student.full_name }}</h3>
+          <p class="muted" style="font-size:12.5px">
+            {{ student.reg_no }} · {{ student.dept_name }} · {{ student.class_name }}</p>
+        </div>
+        <a class="btn no-print" href="{{ url_for('students') }}">
+          <i class="fa-solid fa-arrow-left"></i> Back</a>
+      </div>
+      <div class="stats-grid" style="margin-bottom:0">
+        <div class="stat"><div class="icon i1"><i class="fa-solid fa-list"></i></div>
+          <div><div class="value">{{ total }}</div><div class="label">Sessions</div></div></div>
+        <div class="stat"><div class="icon i4"><i class="fa-solid fa-check"></i></div>
+          <div><div class="value">{{ present }}</div><div class="label">Present</div></div></div>
+        <div class="stat"><div class="icon i6"><i class="fa-solid fa-clock"></i></div>
+          <div><div class="value">{{ late }}</div><div class="label">Late</div></div></div>
+        <div class="stat"><div class="icon i5"><i class="fa-solid fa-xmark"></i></div>
+          <div><div class="value">{{ absent }}</div><div class="label">Absent</div></div></div>
+        <div class="stat"><div class="icon i3"><i class="fa-solid fa-percent"></i></div>
+          <div><div class="value">{{ pct }}%</div>
+            <div class="label"><span class="badge {{ risk_cls }}">{{ risk_txt }}</span></div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Attendance Records</h3>
+      {% if records %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Status</th><th>Marked By</th></tr></thead>
+          <tbody>
+          {% for r in records %}
+            <tr>
+              <td>{{ r.date }}</td>
+              <td><span class="badge {{ r.status|lower }}">{{ r.status }}</span></td>
+              <td class="muted">{{ r.marked_by or '—' }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty"><i class="fa-solid fa-inbox"></i>
+        No attendance recorded for this student yet.</div>
+      {% endif %}
+    </div>
+    

@@ -1,0 +1,39 @@
+
+    <div class="card">
+      <h3>Attendance Rules</h3>
+      <form method="post" action="{{ url_for('settings') }}" style="max-width:420px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label for="late_credit">Late Attendance Credit (0.0 – 1.0)</label>
+          <input id="late_credit" name="late_credit" type="number"
+                 step="0.05" min="0" max="1" value="{{ late_credit }}" required>
+          <p class="muted" style="font-size:12px;margin-top:6px">
+            0.5 means a Late record earns 50% of the credit of a Present.
+            Present = 1.0 credit, Absent = 0 credits.
+          </p>
+        </div>
+        <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>System Users</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Username</th><th>Role</th>
+            <th>Full Name</th><th>Created</th></tr></thead>
+          <tbody>
+          {% for u in users %}
+            <tr><td>{{ u.id }}</td><td><strong>{{ u.username }}</strong></td>
+              <td><span class="badge info">{{ u.role }}</span></td>
+              <td>{{ u.full_name or '—' }}</td><td class="muted">{{ u.created_at }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:12px;font-size:12.5px">
+        Default accounts are created on first run. Passwords are stored as
+        Werkzeug hashes — never in plain text.
+      </p>
+    </div>
+    

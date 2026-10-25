@@ -1,0 +1,118 @@
+
+    <div class="card no-print">
+      <h3>Analytics Filters</h3>
+      <form class="filters" method="get" action="{{ url_for('analytics') }}" style="margin-bottom:0">
+        <div><label>From</label><input type="date" name="start" value="{{ start }}"></div>
+        <div><label>To</label><input type="date" name="end" value="{{ end }}"></div>
+        <div><label>Department</label>
+          <select name="department">
+            <option value="">All Departments</option>
+            {% for d in departments %}
+            <option value="{{ d.id }}" {{ 'selected' if dept == d.id }}>{{ d.name }}</option>
+            {% endfor %}
+          </select></div>
+        <div style="align-self:flex-end;display:flex;gap:8px">
+          <button class="btn btn-primary"><i class="fa-solid fa-filter"></i> Apply</button>
+          <a class="btn btn-ghost" href="{{ url_for('analytics') }}">Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="icon i1"><i class="fa-solid fa-users"></i></div>
+        <div><div class="value">{{ stats|length }}</div><div class="label">Students</div></div></div>
+      <div class="stat"><div class="icon i3"><i class="fa-solid fa-percent"></i></div>
+        <div><div class="value">{{ overall_pct }}%</div><div class="label">Overall Attendance</div></div></div>
+      <div class="stat"><div class="icon i5"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div><div class="value">{{ low|length }}</div><div class="label">Below 75%</div></div></div>
+      <div class="stat"><div class="icon i6"><i class="fa-solid fa-eye"></i></div>
+        <div><div class="value">{{ mid|length }}</div><div class="label">75% – 85%</div></div></div>
+      <div class="stat"><div class="icon i4"><i class="fa-solid fa-award"></i></div>
+        <div><div class="value">{{ high|length }}</div><div class="label">Above 85%</div></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Calculation Rule</h3>
+      <p class="muted">
+        Attendance % = (Present × 1.0 + Late × {{ late_credit }}) ÷ Recorded sessions × 100.<br>
+        Sessions are only counted where attendance was actually recorded — unrecorded days
+        are excluded from the denominator. Late credit is configurable in Settings.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Low Attendance Alerts (&lt; 75%)</h3>
+      {% if low %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reg No</th><th>Student</th><th>Department</th><th>Class</th>
+            <th>Present</th><th>Late</th><th>Absent</th><th>Sessions</th><th>%</th></tr></thead>
+          <tbody>
+          {% for s in low|sort(attribute='pct') %}
+            <tr>
+              <td><strong>{{ s.reg_no }}</strong></td>
+              <td>{{ s.full_name }}</td>
+              <td>{{ s.dept }}</td><td>{{ s.class_name }}</td>
+              <td>{{ s.present }}</td><td>{{ s.late }}</td><td>{{ s.absent }}</td>
+              <td>{{ s.total }}</td>
+              <td><span class="badge danger">{{ s.pct }}%</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty"><i class="fa-solid fa-circle-check"></i>
+        No students below 75% for the selected filters.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3>Top 10 Students by Attendance</h3>
+      {% if top10 %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Reg No</th><th>Student</th><th>Department</th>
+            <th>Class</th><th>Sessions</th><th>%</th></tr></thead>
+          <tbody>
+          {% for s in top10 %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td><strong>{{ s.reg_no }}</strong></td>
+              <td>{{ s.full_name }}</td><td>{{ s.dept }}</td><td>{{ s.class_name }}</td>
+              <td>{{ s.total }}</td>
+              <td><span class="badge ok">{{ s.pct }}%</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty"><i class="fa-solid fa-inbox"></i>No attendance data yet.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3>Department-wise Attendance</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Department</th><th>Students</th><th>Present</th>
+            <th>Late</th><th>Absent</th><th>Sessions</th><th>Attendance %</th></tr></thead>
+          <tbody>
+          {% for d in dept_stats %}
+            <tr>
+              <td><strong>{{ d.dept }}</strong></td>
+              <td>{{ d.students }}</td><td>{{ d.present }}</td>
+              <td>{{ d.late }}</td><td>{{ d.absent }}</td><td>{{ d.sessions }}</td>
+              <td>
+                {% if d.pct >= 85 %}<span class="badge ok">{{ d.pct }}%</span>
+                {% elif d.pct >= 75 %}<span class="badge warn">{{ d.pct }}%</span>
+                {% else %}<span class="badge danger">{{ d.pct }}%</span>{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    

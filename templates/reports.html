@@ -1,0 +1,59 @@
+
+    <div class="card no-print">
+      <h3>Report Builder</h3>
+      <form class="filters" method="get" action="{{ url_for('reports') }}" style="margin-bottom:0">
+        <div><label>Report Type</label>
+          <select name="type" onchange="this.form.submit()">
+            {% for val, label in report_types %}
+            <option value="{{ val }}" {{ 'selected' if rtype == val }}>{{ label }}</option>
+            {% endfor %}
+          </select></div>
+        <div><label>Date</label>
+          <input type="date" name="date" value="{{ request.args.get('date','') }}"></div>
+        <div><label>Month</label>
+          <input type="month" name="month" value="{{ request.args.get('month','') }}"></div>
+        <div><label>From</label>
+          <input type="date" name="start" value="{{ request.args.get('start','') }}"></div>
+        <div><label>To</label>
+          <input type="date" name="end" value="{{ request.args.get('end','') }}"></div>
+        <div><label>Student</label>
+          <select name="student_id">
+            <option value="">— any —</option>
+            {% for s in students_list %}
+            <option value="{{ s.id }}"
+              {{ 'selected' if request.args.get('student_id') == (s.id|string) }}>
+              {{ s.reg_no }} · {{ s.full_name }}</option>
+            {% endfor %}
+          </select></div>
+        <div style="align-self:flex-end;display:flex;gap:8px">
+          <button class="btn btn-primary"><i class="fa-solid fa-play"></i> Generate</button>
+          <a class="btn" href="{{ url_for('reports_export', type=rtype) }}{{ '&' + qs if qs else '' }}">
+            <i class="fa-solid fa-file-csv"></i> Export CSV</a>
+          <button type="button" class="btn" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Print</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>{{ report_title }}</h3>
+        <span class="badge info">{{ rows|length }} row(s)</span>
+      </div>
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+          <tbody>
+          {% for r in rows %}
+            <tr>{% for cell in r %}<td>{{ cell }}</td>{% endfor %}</tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty"><i class="fa-solid fa-inbox"></i>
+        No data available for the selected report and filters.</div>
+      {% endif %}
+    </div>
+    

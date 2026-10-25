@@ -1,0 +1,56 @@
+
+    <script>
+    const doughnutData = {{ doughnut|tojson }};
+    const monthLabels  = {{ month_labels|tojson }};
+    const monthPct     = {{ month_pct|tojson }};
+    const weekLabels   = {{ week_labels|tojson }};
+    const weekPresent  = {{ week_present|tojson }};
+    const weekLate     = {{ week_late|tojson }};
+    const weekAbsent   = {{ week_absent|tojson }};
+    const deptLabels   = {{ dept_labels|tojson }};
+    const deptCounts   = {{ dept_counts|tojson }};
+
+    new Chart(document.getElementById('chartDoughnut'), {
+      type: 'doughnut',
+      data: { labels: ['Present','Late','Absent'],
+        datasets: [{ data: doughnutData,
+          backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderWidth: 0 }] },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins:{ legend:{ position:'bottom' } } }
+    });
+
+    new Chart(document.getElementById('chartMonthly'), {
+      type: 'line',
+      data: { labels: monthLabels,
+        datasets: [{ label:'Attendance %', data: monthPct, tension:.35,
+          borderColor:'#4f46e5', backgroundColor:'rgba(79,70,229,.15)',
+          fill:true, pointRadius:4, pointBackgroundColor:'#4f46e5' }] },
+      options: { responsive:true, maintainAspectRatio:false,
+        scales:{ y:{ beginAtZero:true, max:100, ticks:{ callback:v=>v+'%' } } },
+        plugins:{ legend:{ display:false } } }
+    });
+
+    new Chart(document.getElementById('chartWeekly'), {
+      type: 'bar',
+      data: { labels: weekLabels,
+        datasets: [
+          { label:'Present', data: weekPresent, backgroundColor:'#10b981', borderRadius:5 },
+          { label:'Late',    data: weekLate,    backgroundColor:'#f59e0b', borderRadius:5 },
+          { label:'Absent',  data: weekAbsent,  backgroundColor:'#ef4444', borderRadius:5 }
+        ]},
+      options: { responsive:true, maintainAspectRatio:false,
+        scales:{ x:{ stacked:true }, y:{ stacked:true, beginAtZero:true } },
+        plugins:{ legend:{ position:'bottom' } } }
+    });
+
+    new Chart(document.getElementById('chartDept'), {
+      type: 'bar',
+      data: { labels: deptLabels,
+        datasets: [{ label:'Students', data: deptCounts, backgroundColor:'#6366f1',
+          borderRadius:6 }] },
+      options: { responsive:true, maintainAspectRatio:false, indexAxis:'y',
+        plugins:{ legend:{ display:false } },
+        scales:{ x:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    });
+    </script>
+    

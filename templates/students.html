@@ -1,0 +1,138 @@
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3 style="margin-bottom:3px">Student Directory</h3>
+          <p class="muted" style="font-size:12.5px">{{ total }} record(s) · page {{ page }} of {{ total_pages }}</p>
+        </div>
+        {% if role == 'admin' %}
+        <button class="btn btn-primary" onclick="openAdd()">
+          <i class="fa-solid fa-plus"></i> Add Student</button>
+        {% endif %}
+      </div>
+
+      <form class="filters" method="get" action="{{ url_for('students') }}">
+        <input name="q" value="{{ q }}" placeholder="Search name or reg no…" style="flex:1;min-width:180px">
+        <select name="dept">
+          <option value="">All Departments</option>
+          {% for d in departments %}
+          <option value="{{ d.id }}" {{ 'selected' if dept == (d.id|string) }}>{{ d.name }}</option>
+          {% endfor %}
+        </select>
+        <select name="class">
+          <option value="">All Classes</option>
+          {% for c in classes %}
+          <option value="{{ c }}" {{ 'selected' if klass == c }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filter</button>
+        <a class="btn btn-ghost" href="{{ url_for('students') }}">Reset</a>
+      </form>
+
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Reg No</th><th>Name</th><th>Department</th><th>Class</th>
+            <th>Gender</th><th>Email</th><th>Phone</th><th>Enrolled</th><th>Actions</th>
+          </tr></thead>
+          <tbody>
+          {% for s in rows %}
+            <tr>
+              <td><strong>{{ s.reg_no }}</strong></td>
+              <td>{{ s.full_name }}</td>
+              <td><span class="badge info">{{ s.dept_code }}</span> {{ s.dept_name }}</td>
+              <td>{{ s.class_name }}</td>
+              <td>{{ s.gender or '—' }}</td>
+              <td>{{ s.email or '—' }}</td>
+              <td>{{ s.phone or '—' }}</td>
+              <td>{{ s.enrollment_date or '—' }}</td>
+              <td style="white-space:nowrap">
+                <a class="btn-icon" title="Attendance history"
+                   href="{{ url_for('attendance_history', student_id=s.id) }}">
+                  <i class="fa-solid fa-clock-rotate-left"></i></a>
+                {% if role == 'admin' %}
+                <button class="btn-icon" title="Edit"
+                  data-id="{{ s.id }}" data-reg="{{ s.reg_no }}"
+                  data-name="{{ s.full_name }}" data-email="{{ s.email or '' }}"
+                  data-phone="{{ s.phone or '' }}" data-dept="{{ s.department_id }}"
+                  data-class="{{ s.class_name }}" data-gender="{{ s.gender or '' }}"
+                  data-enrolled="{{ s.enrollment_date or '' }}"
+                  onclick="openEdit(this)"><i class="fa-solid fa-pen"></i></button>
+                <form method="post" style="display:inline"
+                      action="{{ url_for('students_delete', student_id=s.id) }}"
+                      onsubmit="return confirm('Delete {{ s.full_name }}? This also removes their attendance records.');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn-icon danger" title="Delete">
+                    <i class="fa-solid fa-trash"></i></button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        {% if page > 1 %}
+        <a class="page-link" href="{{ url_for('students', q=q, dept=dept, class=klass, page=page-1) }}">&laquo;</a>
+        {% endif %}
+        {% for p in page_links %}
+        <a class="page-link {{ 'active' if p == page }}"
+           href="{{ url_for('students', q=q, dept=dept, class=klass, page=p) }}">{{ p }}</a>
+        {% endfor %}
+        {% if page < total_pages %}
+        <a class="page-link" href="{{ url_for('students', q=q, dept=dept, class=klass, page=page+1) }}">&raquo;</a>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="empty"><i class="fa-solid fa-user-slash"></i>
+        No students match the current filters.</div>
+      {% endif %}
+    </div>
+
+    {% if role == 'admin' %}
+    <div class="modal" id="studentModal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3 id="modalTitle">Add Student</h3>
+          <button class="btn-icon" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form method="post" id="studentForm" action="{{ url_for('students_add') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-grid">
+            <div><label>Registration No *</label>
+              <input name="reg_no" id="f_reg" required></div>
+            <div><label>Full Name *</label>
+              <input name="full_name" id="f_name" required></div>
+            <div><label>Email</label>
+              <input type="email" name="email" id="f_email"></div>
+            <div><label>Phone</label>
+              <input name="phone" id="f_phone"></div>
+            <div><label>Department *</label>
+              <select name="department_id" id="f_dept" required>
+                <option value="">— select —</option>
+                {% for d in departments %}
+                <option value="{{ d.id }}">{{ d.name }}</option>
+                {% endfor %}
+              </select></div>
+            <div><label>Class / Year *</label>
+              <input name="class_name" id="f_class" required placeholder="e.g. SY-A"></div>
+            <div><label>Gender</label>
+              <select name="gender" id="f_gender">
+                <option value="">—</option><option>Male</option>
+                <option>Female</option><option>Other</option>
+              </select></div>
+            <div><label>Enrollment Date</label>
+              <input type="date" name="enrollment_date" id="f_enrolled"></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+            <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+    

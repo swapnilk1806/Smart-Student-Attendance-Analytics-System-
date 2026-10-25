@@ -1,0 +1,92 @@
+
+    <div class="card no-print">
+      <div class="card-head"><h3>Mark Attendance</h3>
+        <span class="badge info">{{ marked }} / {{ rows|length }} marked</span></div>
+      <form class="filters" method="get" action="{{ url_for('attendance') }}">
+        <div><label>Date</label>
+          <input type="date" name="date" value="{{ sel_date }}" required></div>
+        <div><label>Department</label>
+          <select name="department">
+            <option value="">All Departments</option>
+            {% for d in departments %}
+            <option value="{{ d.id }}" {{ 'selected' if dept == d.id }}>{{ d.name }}</option>
+            {% endfor %}
+          </select></div>
+        <div><label>Class</label>
+          <select name="class">
+            <option value="">All Classes</option>
+            {% for c in classes %}
+            <option value="{{ c }}" {{ 'selected' if klass == c }}>{{ c }}</option>
+            {% endfor %}
+          </select></div>
+        <div style="align-self:flex-end">
+          <button class="btn btn-primary"><i class="fa-solid fa-arrows-rotate"></i> Load</button></div>
+      </form>
+    </div>
+
+    {% if rows %}
+    <form method="post" action="{{ url_for('attendance_save') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="date" value="{{ sel_date }}">
+      <input type="hidden" name="department" value="{{ dept or '' }}">
+      <input type="hidden" name="class" value="{{ klass }}">
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Students · {{ sel_date }}</h3>
+          <div class="no-print" style="display:flex;gap:8px">
+            <button type="button" class="btn btn-sm" onclick="setAll('Present')">
+              <i class="fa-solid fa-check-double"></i> All Present</button>
+            <button type="button" class="btn btn-sm" onclick="setAll('Absent')">
+              <i class="fa-solid fa-xmark"></i> All Absent</button>
+            <button class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Reg No</th><th>Student</th><th>Dept</th><th>Class</th>
+              <th>Current</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for s in rows %}
+              <tr>
+                <td><strong>{{ s.reg_no }}</strong></td>
+                <td>{{ s.full_name }}</td>
+                <td><span class="badge info">{{ s.dept_code }}</span></td>
+                <td>{{ s.class_name }}</td>
+                <td>
+                  {% if s.current_status == 'Present' %}<span class="badge present">Present</span>
+                  {% elif s.current_status == 'Late' %}<span class="badge late">Late</span>
+                  {% elif s.current_status == 'Absent' %}<span class="badge absent">Absent</span>
+                  {% else %}<span class="muted">—</span>{% endif %}
+                </td>
+                <td>
+                  <div class="status-group">
+                    <input type="radio" id="p{{ s.id }}" name="status_{{ s.id }}" value="Present"
+                      {{ 'checked' if s.current_status == 'Present' or not s.current_status }}>
+                    <label for="p{{ s.id }}">Present</label>
+                    <input type="radio" id="l{{ s.id }}" name="status_{{ s.id }}" value="Late"
+                      {{ 'checked' if s.current_status == 'Late' }}>
+                    <label for="l{{ s.id }}">Late</label>
+                    <input type="radio" id="a{{ s.id }}" name="status_{{ s.id }}" value="Absent"
+                      {{ 'checked' if s.current_status == 'Absent' }}>
+                    <label for="a{{ s.id }}">Absent</label>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px;text-align:right" class="no-print">
+          <button class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i>
+            Save Attendance</button>
+        </div>
+      </div>
+    </form>
+    {% else %}
+    <div class="card"><div class="empty">
+      <i class="fa-solid fa-user-slash"></i>
+      No students match the selected department / class.
+    </div></div>
+    {% endif %}
+    

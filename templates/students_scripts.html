@@ -1,0 +1,32 @@
+
+    <script>
+    function openAdd(){
+      document.getElementById('modalTitle').textContent = 'Add Student';
+      const f = document.getElementById('studentForm');
+      f.reset();
+      f.action = "{{ url_for('students_add') }}";
+      document.getElementById('studentModal').classList.add('open');
+    }
+    function openEdit(btn){
+      const d = btn.dataset;
+      document.getElementById('modalTitle').textContent = 'Edit Student';
+      const f = document.getElementById('studentForm');
+      f.action = '/students/edit/' + d.id;
+      document.getElementById('f_reg').value      = d.reg;
+      document.getElementById('f_name').value     = d.name;
+      document.getElementById('f_email').value    = d.email;
+      document.getElementById('f_phone').value    = d.phone;
+      document.getElementById('f_dept').value     = d.dept;
+      document.getElementById('f_class').value    = d.class;
+      document.getElementById('f_gender').value   = d.gender;
+      document.getElementById('f_enrolled').value = d.enrolled;
+      document.getElementById('studentModal').classList.add('open');
+    }
+    function closeModal(){
+      document.getElementById('studentModal').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+    </script>
+    
